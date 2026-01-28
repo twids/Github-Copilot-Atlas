@@ -51,14 +51,14 @@ This repository contains custom agent prompts that work together to handle the c
   - Returns structured results with file lists and analysis
   - MANDATORY parallel search strategy (3-10 simultaneous searches)
 
-- **code-review-subagent** (`code-review-subagent.agent.md`) - THE REVIEWER
+- **Code-Review-subagent** (`Code-Review-subagent.agent.md`) - THE REVIEWER
   - **Model:** GPT-5.2 (copilot)
   - Reviews code for correctness, quality, and test coverage
   - Returns structured feedback (APPROVED/NEEDS_REVISION/FAILED)
   - Can be invoked in parallel for independent phases
   - Focus on blocking issues vs nice-to-haves
 
-- **frontend-engineer-subagent** (`frontend-engineer-subagent.agent.md`) - THE UI/UX SPECIALIST
+- **Frontend-Engineer-subagent** (`Frontend-Engineer-subagent.agent.md`) - THE UI/UX SPECIALIST
   - **Model:** Gemini 3 Pro (Preview) (copilot)
   - Implements user interfaces, styling, and responsive layouts
   - Expert in modern frontend frameworks and tooling
@@ -88,8 +88,8 @@ This repository contains custom agent prompts that work together to handle the c
 
 ### 🤝 Proper Agent Handoffs
 - VS Code Custom Agent handoff configuration
-- Each agent declares available delegations
 - Prometheus → Atlas automatic handoff option
+- Each agent can declare available delegations
 - Clear handoff workflow with user approval gates
 
 ### 📋 Structured Planning
@@ -128,13 +128,16 @@ Prometheus will:
 ### Executing a Plan with Atlas
 
 ```
-Implement the plan that was devised by Promethus in the previous prompt 
+Implement the plan devised by Promethus
 ```
+
+OR: Accept the hand-off from Prometheus by clicking 'Start implementation with Atlas'
+
 
 Atlas will:
 1. Review the plan
 2. Delegate Phase 1 implementation to Sisyphus
-3. Delegate review to code-review-subagent
+3. Delegate review to Code-Review
 4. Present results and wait for commit approval
 5. Continue through all phases
 
@@ -183,7 +186,7 @@ Atlas: Phase 1/4 - Test Infrastructure
       └─ Tests pass ✓
 
 Atlas: Reviewing Phase 1
-  └─ @code-review Review Phase 1
+  └─ @Code-Review Review Phase 1
       └─ Status: APPROVED ✓
 
 Atlas: Phase 1 complete! [commit message provided]
@@ -225,7 +228,7 @@ handoff:
     "github.copilot.chat.responsesApiReasoningEffort": "high"
   }
   ```
-  - `customAgentInSubagent.enabled`: Allow subagents to use custom agents defined in a '-agents.md' file like the ones above 
+  - `customAgentInSubagent.enabled`: Allow subagents to use custom agents defined in a '-agents.md' files like the ones above 
   - `responsesApiReasoningEffort`: Set to "high" for enhanced reasoning in planning agents (GPT models)
 
 ## Best Practices
