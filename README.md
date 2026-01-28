@@ -359,17 +359,122 @@ Add an entry to the README's Specialized Subagents section describing when to us
 2. **Leverage parallel execution** - Invoke multiple Explorers/Oracles for large tasks
 3. **Trust the TDD workflow** - Each phase is self-contained with tests
 4. **Review before proceeding** - Check completed phases before moving forward
-5. **Commit frequently** - After each approved phase
+5. **Commit frequently** - After each approved phase after properly testing and ensuring phase functionality
 6. **Delegate appropriately** - Let subagents handle heavy lifting
 
-## Contributing
 
-Contributions are welcome! Please:
-1. Test agent changes thoroughly
-2. Maintain the orchestration architecture
-3. Follow TDD principles in implementation agents
-4. Keep plan format compatible with Atlas
-5. Document any new agents or workflows
+### Adding Custom Agents
+
+You can extend the Atlas and Promethus agents with your own specialized subagents for domain-specific tasks (e.g., database experts, API specialists, security reviewers, etc.).
+
+#### Quick Method: Let the AI Do It
+
+The fastest way to add a custom agent is to simply ask Atlas:
+
+```
+@Atlas Create a new subagent called Database-Expert that specializes in SQL optimization, schema design, and query analysis. Integrate it with Prometheus and Atlas so they can delegate database-related tasks to it.
+```
+
+Atlas will:
+1. Create the agent file with proper YAML frontmatter
+2. Add it to Prometheus's research delegation list
+3. Add it to Atlas's implementation delegation list
+4. Update documentation
+
+#### Manual Method: Step-by-Step
+
+**1. Create Your Agent File**
+
+Create a new file in your prompts directory: `YourAgent-subagent.agent.md`
+
+```yaml
+---
+description: 'Brief description of what this agent does'
+argument-hint: What kind of task to delegate (e.g., "Analyze database schema")
+tools: ['search', 'usages', 'edit', 'runCommands', ...]  # Tools your agent needs
+model: Claude Sonnet 4.5 (copilot)  # Or GPT-5.2, Gemini, etc.
+---
+
+You are a [ROLE] SUBAGENT called by a parent CONDUCTOR agent.
+
+**Your specialty:** [Describe the domain expertise]
+
+**Your scope:** [Define what tasks this agent handles]
+
+**Core workflow:**
+1. [Step 1 of your agent's process]
+2. [Step 2 of your agent's process]
+3. [Return structured findings/results]
+
+[Add any additional instructions, constraints, or examples]
+```
+
+**2. Integrate with Prometheus** (for research tasks)
+
+Edit `Prometheus.agent.md` and add your agent to the research delegation section:
+
+```markdown
+**YourAgent-subagent**:
+- Provide a clear research goal related to [domain]
+- Instruct to analyze [specific aspects]
+- Tell them to return structured findings
+```
+
+Also add to Prometheus's constraints if it shouldn't delegate to your agent:
+```markdown
+- You CAN delegate to YourAgent-subagent for [domain] research
+```
+
+**3. Integrate with Atlas** (for implementation/review tasks)
+
+Edit `Atlas.agent.md`:
+
+a. Add to the subagent list at the top:
+```markdown
+6. YourAgent-subagent: THE [ROLE]. Expert in [domain expertise]
+```
+
+b. Add to the subagent instructions section:
+```markdown
+**YourAgent-subagent**:
+- Use #runSubagent to invoke for [task type] tasks
+- Provide [specific context needed]
+- Instruct to follow [workflow/principles]
+- Remind them to report back with [expected output]
+```
+
+**4. Test Your Integration**
+
+Try invoking your agent:
+```
+Let @YourAgent analyze the current database schema
+```
+
+Or through Atlas:
+```
+@Atlas Use YourAgent to optimize our SQL queries in the user service
+```
+
+**5. Document Usage** (Optional)
+
+Add an entry to the README's Specialized Subagents section describing when to use your custom agent.
+
+#### Best Practices for Custom Agents
+
+- **Single Responsibility**: Each agent should have one clear domain of expertise
+- **Clear Scope**: Define exactly what the agent does and doesn't handle
+- **Model Selection**: Choose the right model for the task (Sonnet for complex reasoning, Flash for speed, GPT for research)
+- **Tool Minimalism**: Only declare tools the agent actually needs
+- **Return Format**: Always return structured findings (not raw dumps)
+- **Parallel-Aware**: Consider if your agent can run in parallel with others
+
+#### Example Custom Agents
+
+- **Security-Auditor**: Reviews code for vulnerabilities, dependency issues, auth flaws
+- **Performance-Analyzer**: Profiles code, identifies bottlenecks, suggests optimizations
+- **API-Designer**: Reviews/designs REST/GraphQL APIs, ensures consistency
+- **Documentation-Writer**: Generates comprehensive docs from code
+- **Migration-Expert**: Handles database migrations, version upgrades, refactoring
 
 ## License
 
