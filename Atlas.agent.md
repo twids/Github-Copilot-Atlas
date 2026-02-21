@@ -49,6 +49,20 @@ You must actively manage your context window by delegating appropriately:
 - If a task requires >1000 tokens of context, strongly consider delegation
 - Prefer delegation when in doubt - subagents are cheaper and focused
 
+## Phase 0: Branch Analysis
+
+Before any planning or implementation, analyze the git state to decide where to work:
+
+1. **Detect current branch**: Run `git branch --show-current` to identify the current branch.
+2. **Detect default branch**: Check for `master` or `main` (use `git symbolic-ref refs/remotes/origin/HEAD` or try both).
+3. **Analyze divergence**: If not on the default branch, run `git log --oneline <default>..<current>` and `git diff --stat <default>` to understand current changes.
+4. **Decide branch strategy**:
+   - **If on default branch with no uncommitted changes**: Create a new feature branch (`git checkout -b <task-slug>`) and work there.
+   - **If on a feature branch whose changes are related to the new task**: Continue on the current branch.
+   - **If on a feature branch whose changes are UNRELATED to the new task**: Stash or warn, then create a new branch from the default branch (`git checkout <default> && git checkout -b <task-slug>`).
+   - **If there are uncommitted changes**: Run `git stash` before switching branches if needed.
+5. **Report decision**: Briefly tell the user which branch you're working on and why.
+
 ## Phase 1: Planning
 
 1. **Analyze Request**: Understand the user's goal and determine the scope.
@@ -104,24 +118,21 @@ For each phase in the plan, execute this cycle:
    - **If NEEDS_REVISION**: Return to 2A with specific revision requirements
    - **If FAILED**: Stop and consult user for guidance
 
-### 2C. Return to User for Commit
-1. **Pause and Present Summary**:
-   - Phase number and objective
-   - What was accomplished
-   - Files/functions created/changed
-   - Review status (approved/issues addressed)
+### 2C. Auto-Commit Phase
+After a phase is APPROVED, commit automatically and continue:
 
-2. **Write Phase Completion File**: Create `<plan-directory>/<task-name>-phase-<N>-complete.md` following <phase_complete_style_guide>.
+1. **Write Phase Completion File**: Create `<plan-directory>/<task-name>-phase-<N>-complete.md` following <phase_complete_style_guide>.
 
-3. **Generate Git Commit Message**: Provide a commit message following <git_commit_style_guide> in a plain text code block for easy copying.
+2. **Stage and Commit**: Run the following git commands:
+   ```
+   git add -A
+   git commit -m "<commit message following git_commit_style_guide>"
+   ```
 
-4. **MANDATORY STOP**: Wait for user to:
-   - Make the git commit
-   - Confirm readiness to proceed to next phase
-   - Request changes or abort
+3. **Log Progress**: Briefly note in chat what was committed (1-2 lines), then immediately proceed.
 
 ### 2D. Continue or Complete
-- If more phases remain: Return to step 2A for next phase
+- If more phases remain: **Immediately** proceed to step 2A for next phase. Do NOT pause.
 - If all phases complete: Proceed to Phase 3
 
 ## Phase 3: Plan Completion
@@ -289,11 +300,13 @@ DON'T include references to the plan or phase numbers in the commit message. The
 
 <stopping_rules>
 CRITICAL PAUSE POINTS - You must stop and wait for user input at:
-1. After presenting the plan (before starting implementation)
-2. After each phase is reviewed and commit message is provided (before proceeding to next phase)
-3. After plan completion document is created
+1. After presenting the plan (before starting implementation) — this is the ONLY mandatory approval gate.
 
-DO NOT proceed past these points without explicit user confirmation.
+You DO NOT stop between phases. After plan approval, execute ALL phases autonomously:
+- Implement → Review → Commit → next phase (no user interaction needed)
+- If a review returns NEEDS_REVISION: retry implementation automatically (up to 2 retries per phase)
+- If a review returns FAILED after retries: STOP and consult user
+- After ALL phases are complete and the final completion document is written: report back to user with the full summary
 </stopping_rules>
 
 <state_tracking>
