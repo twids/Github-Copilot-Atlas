@@ -75,6 +75,32 @@ Every subagent invocation consumes premium requests. Minimize cost by choosing t
 - Running Reflect after a trivially small session (1 file changed, no revisions)
 - Invoking multiple parallel Oracles when a single one would suffice
 
+## Pre-Flight: Plan Resume Detection
+
+Before starting any new work, check if there's an incomplete plan that should be resumed:
+
+1. **Scan for incomplete plans**: List files in the plan directory (`plans/` or configured directory).
+   - Look for `*-plan.md` files that do NOT have a matching `*-complete.md` file.
+   - If no incomplete plans exist, skip to Phase 0.
+
+2. **Determine progress**: For each incomplete plan:
+   - Read the plan file to get the total number of phases.
+   - Count `*-phase-N-complete.md` files to determine which phases finished.
+   - Identify the next phase to execute.
+
+3. **Offer to resume**: Present the user with:
+   - The plan name and objective (from the plan file header)
+   - Progress so far (e.g., "3 of 5 phases completed")
+   - Two options: **Resume** (continue from next incomplete phase) or **Abandon** (archive the plan and start fresh)
+
+4. **If resuming**:
+   - Load the existing plan file (no need to re-plan).
+   - Load memory files for context from previous phases.
+   - Skip directly to Phase 2 (Implementation Cycle) at the correct phase number.
+   - Do NOT re-run Phase 0 or Phase 1.
+
+5. **If abandoning**: Rename the old plan file to `*-plan.abandoned.md` and proceed to Phase 0 normally.
+
 ## Phase 0: Branch Analysis
 
 Before any planning or implementation, analyze the git state to decide where to work:
@@ -178,13 +204,19 @@ After a phase is APPROVED, commit automatically and continue:
    - Key functions/tests added
    - Final verification that all tests pass
 
-2. **Reflect on Session**: Use #runSubagent to invoke Reflect-subagent with:
+2. **Present Completion and Collect Feedback**: Share the completion summary with the user, then ask:
+   > "Plan complete. Before I reflect on this session - quick feedback: **What worked well? What could be improved?** (one sentence each is fine, or skip with 'no feedback')"
+   
+   **MANDATORY STOP** - Wait for user response before proceeding.
+
+3. **Reflect on Session**: Use #runSubagent to invoke Reflect-subagent with:
    - The plan file path and all phase completion files
    - A summary of which phases needed revision and why
    - Any notable review feedback patterns
-   - The Reflect-subagent will extract learnings into `/memories/repo/` files for future sessions
+   - **The user's feedback** (verbatim, if provided)
+   - The Reflect-subagent will extract learnings into `/memories/repo/` files for future sessions, including a dedicated feedback section
 
-3. **Present Completion**: Share completion summary with user, including what the Reflect-subagent learned. Close the task.
+4. **Share Learnings**: Briefly tell the user what the Reflect-subagent learned and stored. Close the task.
 </workflow>
 
 <subagent_instructions>
@@ -346,7 +378,8 @@ DON'T include references to the plan or phase numbers in the commit message. The
 
 <stopping_rules>
 CRITICAL PAUSE POINTS - You must stop and wait for user input at:
-1. After presenting the plan (before starting implementation) — this is the ONLY mandatory approval gate.
+1. After presenting the plan (before starting implementation) - this is the primary approval gate.
+2. After presenting the completion summary (to collect user feedback before reflection).
 
 You DO NOT stop between phases. After plan approval, execute ALL phases autonomously:
 - Implement → Review → Commit → next phase (no user interaction needed)
