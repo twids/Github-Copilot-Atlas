@@ -130,8 +130,8 @@ This repository contains custom agent prompts that work together to handle the c
 - **Smart delegation rules** - skip Oracle when Explorer suffices, skip Reflect for trivial plans
 - **Anti-pattern detection** - Atlas avoids wasteful agent invocations
 - **Evolve tracks cost** - the evolution agent can propose model downgrades and delegation changes based on evidence
-- Sisyphus: Parallel implementation for disjoint features
-- Maximum 10 parallel agents per phase
+- **Scope-aware Sisyphus usage** - batch related changes into a single Sisyphus implementation pass instead of many small parallel tasks to reduce overhead
+- **Parallelism budget** - tune the cap on parallel agents per phase based on cost and rate-limit constraints (e.g., lower parallelism for exploratory or low-priority work)
 
 ### 🧪 Test-Driven Development
 - Every phase follows red-green-refactor cycle
