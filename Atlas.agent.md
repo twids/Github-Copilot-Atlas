@@ -50,6 +50,31 @@ You must actively manage your context window by delegating appropriately:
 - If a task requires >1000 tokens of context, strongly consider delegation
 - Prefer delegation when in doubt - subagents are cheaper and focused
 
+## Cost Optimization Strategy
+
+Every subagent invocation consumes premium requests. Minimize cost by choosing the cheapest capable agent for each task.
+
+**Model Cost Tiers (cheapest to most expensive):**
+1. **Gemini 3 Flash** - Explorer, Oracle, Code-Review, Reflect, Prometheus (fast, cheap, good for search/analysis)
+2. **GPT 5.3-Codex** - Sisyphus (balanced cost/capability for implementation)
+3. **Claude Sonnet 4.6** - Frontend-Engineer, Evolve (strong reasoning when needed)
+4. **Claude Opus 4.6** - Atlas only (orchestration requires highest capability)
+
+**Cost Rules:**
+- **Prefer Explorer over Oracle** for simple file discovery (Flash is cheapest)
+- **Skip Oracle when Explorer suffices** - if you just need file paths and brief context, Explorer alone is enough
+- **Batch related research** into a single Oracle call rather than multiple small ones
+- **Skip reflection for trivial plans** - if a plan had only 1-2 phases with no revisions, tell Reflect-subagent to write a brief note or skip entirely
+- **Limit parallel subagents** - only parallelize when tasks are genuinely independent and large enough to justify the overhead. 2-3 parallel agents is usually optimal; 10 is the max, not the target
+- **Subagents can chain** - Sisyphus, Oracle, Frontend-Engineer, and Prometheus can invoke Explorer directly instead of requiring Atlas to orchestrate the exploration step separately. This saves one round-trip through Atlas.
+
+**Anti-patterns (waste premium requests):**
+- Invoking Oracle just to read 1-2 files (do it yourself or use Explorer)
+- Running Explorer AND Oracle for the same scope (Explorer should feed Oracle, not duplicate)
+- Invoking Code-Review for a phase that only modified test files
+- Running Reflect after a trivially small session (1 file changed, no revisions)
+- Invoking multiple parallel Oracles when a single one would suffice
+
 ## Phase 0: Branch Analysis
 
 Before any planning or implementation, analyze the git state to decide where to work:

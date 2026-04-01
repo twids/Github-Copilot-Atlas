@@ -22,7 +22,7 @@ This repository contains custom agent prompts that work together to handle the c
   - Handles phase tracking and user approval gates
 
 - **Prometheus** (`Prometheus.agent.md`) - The AUTONOMOUS PLANNER
-  - **Model:** Gemini 3.1 Pro (copilot)
+  - **Model:** Gemini 3 Flash (Preview) (copilot)
   - Researches requirements and analyzes codebases
   - Writes comprehensive TDD-driven implementation plans
   - Automatically hands off to Atlas for execution
@@ -31,7 +31,7 @@ This repository contains custom agent prompts that work together to handle the c
 ### Specialized Subagents
 
 - **Oracle-subagent** (`Oracle-subagent.agent.md`) - THE RESEARCHER
-  - **Model:** Gemini 3.1 Pro (copilot)
+  - **Model:** Gemini 3 Flash (Preview) (copilot)
   - Gathers comprehensive context about tasks
   - Can delegate to Explorer for large-scope research
   - Returns structured findings to parent agents
@@ -42,6 +42,7 @@ This repository contains custom agent prompts that work together to handle the c
   - Executes implementation following strict TDD principles
   - Writes tests first, then minimal code to pass
   - Handles linting and formatting
+  - Can invoke Explorer or Oracle directly for context
   - Can be invoked in parallel for disjoint features
 
 - **Explorer-subagent** (`Explorer-subagent.agent.md`) - THE SCOUT
@@ -52,7 +53,7 @@ This repository contains custom agent prompts that work together to handle the c
   - MANDATORY parallel search strategy (3-10 simultaneous searches)
 
 - **Code-Review-subagent** (`Code-Review-subagent.agent.md`) - THE REVIEWER
-  - **Model:** Claude Sonnet 4.6 (copilot)
+  - **Model:** Gemini 3 Flash (Preview) (copilot)
   - Reviews code for correctness, quality, and test coverage
   - Returns structured feedback (APPROVED/NEEDS_REVISION/FAILED)
   - Can be invoked in parallel for independent phases
@@ -64,21 +65,23 @@ This repository contains custom agent prompts that work together to handle the c
   - Expert in modern frontend frameworks and tooling
   - Follows TDD principles for frontend (component tests first)
   - Focuses on accessibility and responsive design
+  - Can invoke Explorer directly for context
 
 ### Memory & Evolution Agents
 
 - **Reflect-subagent** (`Reflect-subagent.agent.md`) - THE LEARNER
-  - **Model:** Claude Sonnet 4.6 (copilot)
+  - **Model:** Gemini 3 Flash (Preview) (copilot)
   - Invoked automatically at the end of each completed plan
   - Extracts durable learnings into persistent `/memories/repo/` files
   - Categories: patterns, decisions, corrections, tool preferences, principles
   - Enables Atlas to build institutional knowledge across sessions
 
 - **Evolve** (`Evolve.agent.md`) - THE SELF-IMPROVER
-  - **Model:** Claude Opus 4.6 (copilot)
+  - **Model:** Claude Sonnet 4.6 (copilot)
   - Invoked manually by the user to evolve agent instructions
   - Reads accumulated memory files and identifies gaps in agent instructions
   - Proposes incremental changes with evidence from past sessions
+  - Can propose cost optimizations (model downgrades, skipping unnecessary agents)
   - Validates all changes against the immutable constitution
   - Maintains a versioned changelog (`evolution-log.md`)
 
@@ -108,6 +111,25 @@ This repository contains custom agent prompts that work together to handle the c
 - Launch multiple subagents simultaneously for independent tasks
 - Explorer: 3-10 parallel searches in first batch
 - Oracle: Parallel research across multiple subsystems
+- Sisyphus: Parallel implementation for disjoint features
+- Maximum 10 parallel agents per phase
+
+### 🔗 Subagent Chaining
+- Subagents can invoke other subagents directly (VS Code 2026+ feature)
+- Sisyphus and Frontend-Engineer can invoke Explorer for context without routing through Atlas
+- Oracle can invoke Explorer for file discovery during research
+- Prometheus can invoke Explorer and Oracle directly during planning
+- Reduces round-trips through Atlas, saving context and premium requests
+
+### 💰 Cost Optimization
+- **Tiered model assignment** - cheapest capable model for each role:
+  - Gemini 3 Flash: Explorer, Oracle, Code-Review, Reflect, Prometheus (fast, cheap)
+  - GPT 5.3-Codex: Sisyphus (balanced for implementation)
+  - Claude Sonnet 4.6: Frontend-Engineer, Evolve (strong reasoning)
+  - Claude Opus 4.6: Atlas only (orchestration)
+- **Smart delegation rules** - skip Oracle when Explorer suffices, skip Reflect for trivial plans
+- **Anti-pattern detection** - Atlas avoids wasteful agent invocations
+- **Evolve tracks cost** - the evolution agent can propose model downgrades and delegation changes based on evidence
 - Sisyphus: Parallel implementation for disjoint features
 - Maximum 10 parallel agents per phase
 

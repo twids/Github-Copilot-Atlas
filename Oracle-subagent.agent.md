@@ -2,7 +2,8 @@
 description: Research context and return findings to parent agent
 argument-hint: Research goal or problem statement
 tools: ['search', 'usages', 'problems', 'changes', 'testFailure', 'fetch','agent']
-model: Gemini 3.1 Pro (copilot)
+agents: ['Explorer-subagent']
+model: Gemini 3 Flash (Preview) (copilot)
 ---
 You are a PLANNING SUBAGENT called by a parent CONDUCTOR agent.
 

@@ -1,7 +1,8 @@
 ---
 description: 'Autonomous planner that writes comprehensive implementation plans and feeds them to Atlas'
 tools: ['edit', 'search', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'githubRepo', 'runSubagent']
-model: Gemini 3.1 Pro (copilot)
+agents: ['Explorer-subagent', 'Oracle-subagent']
+model: Gemini 3 Flash (Preview) (copilot)
 handoffs:
   - label: Start implementation with Atlas
     agent: Atlas
