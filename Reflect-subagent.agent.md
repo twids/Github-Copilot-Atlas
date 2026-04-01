@@ -50,12 +50,18 @@ Your SOLE job is to analyze what happened during the session and extract durable
       - Workflow improvements for next time
       - User preferences observed during the session
 
+   f. **User Feedback** - Direct input from the user (if provided):
+      - What they said worked well - reinforce these patterns
+      - What they said could improve - flag as action items
+      - Store verbatim quotes in `/memories/repo/feedback.md` with date headers
+
 3. **Update Memory Files:**
    - Read existing memory files (if they exist) to avoid duplicates
    - Append new learnings with a date header
    - Keep entries concise: 1-2 lines per learning
    - Use bullet points, not prose
    - If a learning contradicts an existing entry, update the old entry (note the correction)
+   - For user feedback: always store in `/memories/repo/feedback.md`, even if it seems minor - user voice is highest-signal data
 
 4. **Return Summary:**
    Report back what was extracted and saved, organized by category.
@@ -86,8 +92,12 @@ Your SOLE job is to analyze what happened during the session and extract durable
 **Principles:** {count} new entries
 - {brief summary of each}
 
+**User Feedback:** {recorded / none provided}
+- {what the user said, if anything}
+
 **Memory files updated:**
 - /memories/repo/patterns.md
 - /memories/repo/decisions.md
+- /memories/repo/feedback.md
 - (etc.)
 ```
