@@ -65,6 +65,28 @@ This repository contains custom agent prompts that work together to handle the c
   - Follows TDD principles for frontend (component tests first)
   - Focuses on accessibility and responsive design
 
+### Memory & Evolution Agents
+
+- **Reflect-subagent** (`Reflect-subagent.agent.md`) - THE LEARNER
+  - **Model:** Claude Sonnet 4.6 (copilot)
+  - Invoked automatically at the end of each completed plan
+  - Extracts durable learnings into persistent `/memories/repo/` files
+  - Categories: patterns, decisions, corrections, tool preferences, principles
+  - Enables Atlas to build institutional knowledge across sessions
+
+- **Evolve** (`Evolve.agent.md`) - THE SELF-IMPROVER
+  - **Model:** Claude Opus 4.6 (copilot)
+  - Invoked manually by the user to evolve agent instructions
+  - Reads accumulated memory files and identifies gaps in agent instructions
+  - Proposes incremental changes with evidence from past sessions
+  - Validates all changes against the immutable constitution
+  - Maintains a versioned changelog (`evolution-log.md`)
+
+### Supporting Files
+
+- **Constitution** (`constitution.md`) - Immutable safety guardrails that no agent can modify
+- **Evolution Log** (`evolution-log.md`) - Versioned record of all agent instruction changes
+
 ## Key Features
 
 ### � Context Conservation: The Game Changer
@@ -106,6 +128,26 @@ This repository contains custom agent prompts that work together to handle the c
 - 3-10 incremental, self-contained phases
 - Open questions with options/recommendations
 - Risk assessment and mitigation strategies
+
+### 🧠 Persistent Memory (Phantom-inspired)
+- Atlas loads workspace memory at the start of each session
+- Reflect-subagent extracts learnings after each completed plan
+- Memory files persist in `/memories/repo/` across sessions
+- Categories: patterns, decisions, corrections, tool preferences, principles
+- Future sessions benefit from past experience automatically
+
+### 🔄 Self-Evolution (Phantom-inspired)
+- Evolve agent analyzes accumulated memory to find improvement opportunities
+- Proposes targeted changes to agent instructions with evidence
+- Protected by an immutable constitution (10 safety principles)
+- All changes require user approval and are logged with version history
+- Incremental: small, justified changes only
+
+### 🛡️ Constitution
+- 10 immutable principles no agent can modify
+- Ensures TDD workflow, approval gates, and review steps are never removed
+- Prevents agents from escalating their own permissions
+- Blocks credential storage in memory or plan files
 
 ## Installation
 
@@ -171,6 +213,23 @@ Explorer will:
 1. Launch 3-10 parallel searches immediately
 2. Read necessary files to confirm relationships
 3. Return structured results with file list and analysis
+
+### Evolving Agent Instructions with Evolve
+
+After several sessions have accumulated memory, run:
+
+```
+@Evolve Review my memory files and propose improvements to the agent instructions
+```
+
+Evolve will:
+1. Read all `/memories/repo/` files for accumulated learnings
+2. Compare insights against current agent instructions
+3. Propose specific, evidence-based changes
+4. Wait for your approval before modifying any files
+5. Log all changes to `evolution-log.md`
+
+**Note:** Reflection happens automatically at the end of Atlas plans. Evolution is manual - invoke it when you feel the agents could work better based on accumulated experience.
 
 ## Workflow Example
 
