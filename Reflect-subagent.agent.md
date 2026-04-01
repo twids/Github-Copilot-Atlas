@@ -2,7 +2,7 @@
 description: 'Post-session reflection agent that extracts learnings into persistent memory'
 argument-hint: Reflect on the completed session and extract learnings
 tools: ['search/codebase', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/changes', 'read/readFile', 'edit/createFile', 'edit/editFiles']
-model: Claude Sonnet 4.6 (copilot)
+model: Gemini 3 Flash (Preview) (copilot)
 ---
 You are a REFLECTION SUBAGENT called by the CONDUCTOR agent (Atlas) at the end of a completed plan.
 
